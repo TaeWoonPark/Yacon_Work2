@@ -8,6 +8,7 @@ class NextController extends Controller
 {
     public function index()
     {
+        // next.blade.php を呼び出す
         return view('next');
     }
 }

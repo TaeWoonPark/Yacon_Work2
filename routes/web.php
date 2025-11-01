@@ -1,31 +1,36 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\Controller;
-use App\Http\Controllers\WorkRecordController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\NextController;
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\ProfileController;
 
-// ------------------- 認証 -------------------
-Route::get('/login', [Controller::class, 'showLoginForm'])->name('login');
-Route::post('/login', [Controller::class, 'login'])->name('login.post');
-Route::post('/logout', [Controller::class, 'logout'])->name('logout');
+// 🔐 認証関連
+Route::get('/login', [AuthController::class, 'showLogin'])->name('login');
+Route::post('/login', [AuthController::class, 'login']);
+Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
+Route::get('/register', [AuthController::class, 'showRegister'])->name('register');
+Route::post('/register', [AuthController::class, 'register']);
 
-// ------------------- 認証済みユーザー -------------------
+// 🧭 認証後にアクセスできるルート
 Route::middleware('auth')->group(function () {
+    // 作業履歴ページ
+    Route::get('/work_records', [TaskController::class, 'index'])->name('work_records.index');
 
+    // ダッシュボード（ここで tasks を渡す）
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
-    Route::get('/next', [NextController::class, 'index'])->name('next');
 
-    Route::get('work_records', [WorkRecordController::class, 'index'])->name('work_records.index');
-    Route::get('work_records/create', [WorkRecordController::class, 'create'])->name('work_records.create');
-    Route::post('work_records', [WorkRecordController::class, 'store'])->name('work_records.store');
-    Route::get('work_records/pdf/{id}', [WorkRecordController::class, 'pdf'])->name('work_records.pdf');
-    Route::get('work_records/{id}/share', [WorkRecordController::class, 'share'])->name('work_records.share');
+    // タスク管理
+    Route::resource('tasks', TaskController::class);
+
+    // プロフィール関連（任意）
+    Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
+    Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');
+    Route::delete('/profile', [ProfileController::class, 'destroy'])->name('profile.destroy');
 });
 
-// ------------------- 共有リンク（認証不要） -------------------
-Route::get('work_records/shared/{token}', [WorkRecordController::class, 'sharedView'])
-    ->name('work_records.shared');
-Route::get('work_records/shared/{token}/pdf', [WorkRecordController::class, 'sharedPdf'])
-    ->name('work_records.shared.pdf');
+// 🏠 トップページはログインにリダイレクト
+Route::get('/', function () {
+    return redirect('/login');
+});

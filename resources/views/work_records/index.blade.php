@@ -1,50 +1,32 @@
-@extends('layouts.app')
+<x-layouts.app>
+    <h1 class="text-3xl font-bold mb-6 text-primary">作業履歴</h1>
 
-@section('content')
-    <div class="mt-6 bg-white p-6 rounded-lg shadow">
-
-        <h2 class="text-xl font-bold mb-4">📋 作業一覧</h2>
-
-        <div class="mb-4 text-right">
-            <a href="{{ route('work_records.create') }}"
-                class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">新規作業登録</a>
-        </div>
-
-        <table class="w-full border-collapse border border-gray-300">
-            <thead>
-                <tr class="bg-gray-100">
-                    <th class="border border-gray-300 p-2">日付</th>
-                    <th class="border border-gray-300 p-2">内容</th>
-                    <th class="border border-gray-300 p-2">加工量</th>
-                    <th class="border border-gray-300 p-2">歩留まり</th>
-                    <th class="border border-gray-300 p-2">操作</th>
+    <table class="table-auto border-collapse border border-gray-300 w-full max-w-3xl">
+        <thead class="bg-purple-200">
+            <tr>
+                <th class="border px-4 py-2">ID</th>
+                <th class="border px-4 py-2">作業名</th>
+                <th class="border px-4 py-2">担当者</th>
+                <th class="border px-4 py-2">期限</th>
+                <th class="border px-4 py-2">状態</th>
+                <th class="border px-4 py-2">作成日</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach($tasks as $task)
+                <tr class="text-center">
+                    <td class="border px-4 py-2">{{ $task->id }}</td>
+                    <td class="border px-4 py-2">{{ $task->name }}</td>
+                    <td class="border px-4 py-2">{{ $task->assignee }}</td>
+                    <td class="border px-4 py-2">{{ $task->deadline }}</td>
+                    <td class="border px-4 py-2">{{ $task->status }}</td>
+                    <td class="border px-4 py-2">{{ $task->created_at }}</td>
                 </tr>
-            </thead>
-            <tbody>
-                @forelse($work_records as $record)
-                    <tr>
-                        <td class="border border-gray-300 p-2">{{ $record->date->format('Y-m-d') }}</td>
-                        <td class="border border-gray-300 p-2">{{ $record->content }}</td>
-                        <td class="border border-gray-300 p-2">{{ $record->quantity }} kg</td>
-                        <td class="border border-gray-300 p-2">{{ $record->yield }}%</td>
-                        <td class="border border-gray-300 p-2 space-x-1">
-                            <a href="{{ route('work_records.pdf', $record->id) }}"
-                                class="bg-gray-500 hover:bg-gray-700 text-white py-1 px-2 rounded">PDF</a>
-                            <a href="{{ route('work_records.share', $record->id) }}"
-                                class="bg-yellow-500 hover:bg-yellow-700 text-white py-1 px-2 rounded">共有</a>
-                        </td>
-                    </tr>
-                @empty
-                    <tr>
-                        <td colspan="5" class="border border-gray-300 p-2 text-center text-gray-500">作業記録はありません</td>
-                    </tr>
-                @endforelse
-            </tbody>
-        </table>
+            @endforeach
+        </tbody>
+    </table>
 
-        <!-- フッター -->
-        <div class="text-center text-gray-500 mt-6 mb-6">
-            YACON WORKS ◯◯◯
-        </div>
+    <div class="mt-6">
+        <a href="{{ route('dashboard') }}" class="bg-primary text-white px-4 py-2 rounded hover:bg-purple-700">ダッシュボードに戻る</a>
     </div>
-@endsection
+</x-layouts.app>
