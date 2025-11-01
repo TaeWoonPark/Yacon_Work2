@@ -1,38 +1,57 @@
 @extends('layouts.app')
 
 @section('content')
-    <h2>📝 加工作業 記録入力フォーム</h2>
+    <div class="mt-6 bg-white p-6 rounded-lg shadow max-w-lg mx-auto">
 
-    <form action="{{ route('work_records.store') }}" method="POST" enctype="multipart/form-data">
-        @csrf
+        <h2 class="text-xl font-bold mb-4">➕ 作業登録</h2>
 
-        <label>日付</label>
-        <input type="date" name="date" value="{{ old('date', date('Y-m-d')) }}">
+        @if ($errors->any())
+            <div class="mb-4 p-3 bg-red-100 text-red-700 rounded">
+                <ul class="list-disc pl-5">
+                    @foreach ($errors->all() as $error)
+                        <li>{{ $error }}</li>
+                    @endforeach
+                </ul>
+            </div>
+        @endif
 
-        <label>作業内容</label>
-        <input type="text" name="content" value="{{ old('content') }}" placeholder="例：スライス乾燥">
+        <form action="{{ route('work_records.store') }}" method="POST" class="space-y-4">
+            @csrf
 
-        <label>作業人数</label>
-        <input type="number" name="workers" value="{{ old('workers') }}" min="1" placeholder="例：3">
+            <div>
+                <label class="block mb-1 font-bold">日付</label>
+                <input type="date" name="date" value="{{ old('date') }}" class="w-full border rounded px-3 py-2">
+            </div>
 
-        <label>作業時間（時間）</label>
-        <input type="number" step="0.1" name="work_time" value="{{ old('work_time') }}" placeholder="例：5.5">
+            <div>
+                <label class="block mb-1 font-bold">作業内容</label>
+                <input type="text" name="content" value="{{ old('content') }}" class="w-full border rounded px-3 py-2"
+                    placeholder="例：スライス乾燥">
+            </div>
 
-        <label>加工前重量（kg）</label>
-        <input type="number" step="0.1" name="weight_before" value="{{ old('weight_before') }}" placeholder="例：25.0">
+            <div>
+                <label class="block mb-1 font-bold">加工量 (kg)</label>
+                <input type="number" step="0.01" name="quantity" value="{{ old('quantity') }}"
+                    class="w-full border rounded px-3 py-2">
+            </div>
 
-        <label>加工後重量（kg）</label>
-        <input type="number" step="0.1" name="weight_after" value="{{ old('weight_after') }}" placeholder="例：20.5">
+            <div>
+                <label class="block mb-1 font-bold">歩留まり (%)</label>
+                <input type="number" step="0.01" name="yield" value="{{ old('yield') }}"
+                    class="w-full border rounded px-3 py-2">
+            </div>
 
-        <label>備考</label>
-        <textarea name="remarks" placeholder="自由記入">{{ old('remarks') }}</textarea>
+            <div class="flex justify-between items-center mt-4">
+                <button type="submit"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">作業を追加</button>
+                <a href="{{ route('work_records.index') }}"
+                    class="bg-gray-500 hover:bg-gray-700 text-white font-bold py-2 px-4 rounded">戻る</a>
+            </div>
+        </form>
 
-        <label>加工前写真</label>
-        <input type="file" name="photo_before">
-
-        <label>加工後写真</label>
-        <input type="file" name="photo_after">
-
-        <button type="submit">登録する</button>
-    </form>
+        <!-- フッター -->
+        <div class="text-center text-gray-500 mt-6 mb-6">
+            YACON WORKS ◯◯◯
+        </div>
+    </div>
 @endsection

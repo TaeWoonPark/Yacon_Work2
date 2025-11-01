@@ -4,50 +4,58 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\WorkRecord;
+use Illuminate\Support\Str;
 
 class WorkRecordController extends Controller
 {
-    // 入力フォーム
+    public function index()
+    {
+        $work_records = WorkRecord::latest()->get();
+        return view('work_records.index', compact('work_records'));
+    }
+
     public function create()
     {
-        $this->authorize('create', WorkRecord::class);
         return view('work_records.create');
     }
 
-    // 保存
     public function store(Request $request)
     {
-        $this->authorize('create', WorkRecord::class);
-
-        $data = $request->validate([
+        $request->validate([
             'date' => 'required|date',
-            'content' => 'required|string|max:255',
-            'workers' => 'required|integer|min:1',
-            'work_time' => 'required|numeric|min:0',
-            'weight_before' => 'required|numeric|min:0',
-            'weight_after' => 'required|numeric|min:0',
-            'remarks' => 'nullable|string',
-            'photo_before' => 'nullable|image',
-            'photo_after' => 'nullable|image',
+            'content' => 'required|string',
+            'quantity' => 'required|numeric',
+            'yield' => 'required|numeric',
         ]);
 
-        // 画像保存
-        if ($request->hasFile('photo_before')) {
-            $data['photo_before'] = $request->file('photo_before')->store('photos');
-        }
-        if ($request->hasFile('photo_after')) {
-            $data['photo_after'] = $request->file('photo_after')->store('photos');
-        }
-
-        WorkRecord::create($data);
-
-        return redirect()->route('work_records.index')->with('success', '作業記録を登録しました。');
+        WorkRecord::create($request->all());
+        return redirect()->route('work_records.index')->with('success', '作業を追加しました');
     }
 
-    // 一覧
-    public function index()
+    public function pdf($id)
     {
-        $records = WorkRecord::orderBy('date', 'desc')->get();
-        return view('work_records.index', compact('records'));
+        $record = WorkRecord::findOrFail($id);
+        return "PDF出力機能は未実装です";
+    }
+
+    public function share($id)
+    {
+        $record = WorkRecord::findOrFail($id);
+        $record->share_token = Str::random(16);
+        $record->save();
+        $url = route('work_records.shared', $record->share_token);
+        return redirect()->back()->with('success', "共有リンク生成: $url");
+    }
+
+    public function sharedView($token)
+    {
+        $record = WorkRecord::where('share_token', $token)->firstOrFail();
+        return view('work_records.shared', compact('record'));
+    }
+
+    public function sharedPdf($token)
+    {
+        $record = WorkRecord::where('share_token', $token)->firstOrFail();
+        return "共有PDF機能は未実装です";
     }
 }

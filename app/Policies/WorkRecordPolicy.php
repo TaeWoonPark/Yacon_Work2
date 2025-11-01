@@ -13,6 +13,25 @@ class WorkRecordPolicy
     /**
      * 作業記録作成権限
      */
+
+    // WorkRecordPolicy.php
+    public function view(User $user, WorkRecord $record)
+    {
+        return in_array($user->role, ['admin', 'facility']);
+    }
+
+
+    public function share(User $user, WorkRecord $record)
+    {
+        // 管理者のみ共有可能
+        return $user->role === 'admin';
+    }
+
+    public function viewAny(User $user)
+    {
+        // admin / facility のユーザーのみ閲覧可能
+        return in_array($user->role, ['admin', 'facility']);
+    }
     public function create(User $user)
     {
         // admin または facility のユーザーのみ作成可能
